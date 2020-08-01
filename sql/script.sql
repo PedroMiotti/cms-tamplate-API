@@ -45,22 +45,14 @@ CREATE TABLE IF NOT EXISTS `cms`.`usuario` (
   `user_login` VARCHAR(45) NULL,
   `user_nome` VARCHAR(100) NULL,
   `user_senha` VARCHAR(100) NULL,
-  `user_token` VARCHAR(45) NULL,
   `perf_id` INT NULL,
-  `setor_id` INT NULL,
   PRIMARY KEY (`user_id`),
   INDEX `perf_id_user_idx` (`perf_id` ASC) VISIBLE,
-  INDEX `setor_id_user_idx` (`setor_id` ASC) VISIBLE,
   CONSTRAINT `perf_id_user`
     FOREIGN KEY (`perf_id`)
     REFERENCES `cms`.`perfil` (`perf_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `setor_id_user`
-    FOREIGN KEY (`setor_id`)
-    REFERENCES `cms`.`setor` (`setor_id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 

@@ -7,23 +7,23 @@
     require('dotenv').config();
     //Cors
     const cors = require('cors');
+    
+
     //Rotas
     const Usuario = require('./routes/usuario/usuario');
-
+    const Perfil = require('./routes/perfil/perfil');
 
 
 // CONFIG
-app.use(express.json());
-app.use(cors());
+    app.use(express.json());
+    app.use(cors());
 
 
-app.get('/', (req, res) => {
-    res.json("Hello")
-})
 
+// ROTAS
+    app.use('/usuario', Usuario);
+    app.use('/perfil', Perfil);
 
-// Rotas
-app.use('/usuario', Usuario);
 
 
 const PORT = process.env.PORT || 4000;
