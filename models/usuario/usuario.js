@@ -60,7 +60,7 @@ module.exports = class Usuario {
 
         await Sql.conectar(async (sql) => {
 
-            let resp = await sql.query("SELECT u.user_id, u.user_login, u.user_nome, p.perf_nome FROM usuario u INNER JOIN perfil p ON u.perf_id = p.perf_id WHERE u.user_id = ?",[id]);
+            let resp = await sql.query("SELECT user_id, user_login, user_nome, perf_id FROM usuario WHERE user_id = ?",[id]);
             let row = resp[0];
 
             if(!resp || !resp.length) return res.status(400).send({message : "Usuário não encontrado !"})
@@ -69,7 +69,7 @@ module.exports = class Usuario {
             u.id = row.user_id;
             u.login = row.user_login;
             u.nome = row.user_nome;
-            u.perf_id = row.perf_nome
+            u.perf_id = row.perf_id
 
             return res.status(200).send({ u })
 
@@ -114,12 +114,13 @@ module.exports = class Usuario {
 				}
             }
 
-            return res.status(201).send({ message: `Usuario criado com sucesso ! Senha padrao : ${process.env.SENHA_PADRAO}` })
+            return res.status(201).send({ message: `Usuário criado com sucesso ! Senha padrão : ${process.env.SENHA_PADRAO}` })
         })
 
 
     }
 
+    // --> Listar todos os usuarios
     static async listUser(res){
 
         let usuarios;
@@ -132,6 +133,43 @@ module.exports = class Usuario {
 
         return res.status(200).send( usuarios || [] )
 
+
+    }
+
+    // --> Editar usuario
+    static async editUser(res, id, nome, perfil){
+
+        // TODO --> form validation
+
+        if(!id) return res.status(400).send({message: "Usuário não encontrado !"});
+
+        if (id === 1) return res.status(403).send({message: "Não é possivel editar o administrador princípal"});
+
+        await Sql.conectar(async(sql) => {
+
+            await sql.query("UPDATE usuario SET user_nome = ?, perf_id = ? WHERE user_id = ?", [nome, perfil, id])
+            
+            if(sql.linhasAfetadas === 0) return res.status(400).send({message : "Usuário não encontrado !"})
+
+            return res.status(200).send({ message: "Usuário alterado com successo !"})
+        })
+
+    }
+
+    // --> Deletar usuario
+    static async deleteUser(res, id){
+
+        if(!id) return res.status(400).send({message: "Usuário não encontrado !"});
+
+        if(id === 1) return res.status(403).send({message: "Não é possivel excuir o administrador princípal"});
+
+        await Sql.conectar(async(sql) => {
+            await sql.query("DELETE FROM usuario WHERE user_id = ? ", [id]);
+
+            if(sql.linhasAfetadas === 0) return res.status(400).send({message : "Usuário não encontrado !"})
+
+            return res.status(200).send({ message: "Usuário excluido com successo !"})
+        })
 
     }
 

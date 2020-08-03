@@ -59,3 +59,7 @@ ENGINE = InnoDB;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+
+-- Insert adm user 
+INSERT INTO usuario ( user_login, user_nome, user_senha, perf_id) VALUES ( "ADMIN", "ADMINISTRADOR" , "$2a$10$EseNus2WT8hzCQdLYfK3/u/zkmkD2X72uBNIG9RJcjuvdK.zZSiam", 1) ;

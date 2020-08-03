@@ -11,7 +11,6 @@
 
     //Model
     const Usuario = require('../../models/usuario/usuario');
-const { listUser } = require('../../models/usuario/usuario');
 
 
 // MIDDLEWARE
@@ -35,7 +34,6 @@ const authToken = (req, res, next) => {
 
         await Usuario.login(req.body.username, req.body.password, res)
         
-        
     })
 
     // --> Informacoes do usuario
@@ -57,6 +55,20 @@ const authToken = (req, res, next) => {
 
         await Usuario.listUser(res);
 
+    })
+
+    // --> Editar Usuario
+    router.post("/editar", authToken ,async(req, res) => {
+
+        await Usuario.editUser(res, req.body.id, req.body.nome, req.body.perfil)
+
+    })
+
+    // --> Deletar Usuario
+    router.post("/excluir", authToken, async(req, res) => {
+
+        await Usuario.deleteUser(res, req.body.id)
+        
     })
 
 
