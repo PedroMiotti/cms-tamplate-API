@@ -143,7 +143,7 @@ module.exports = class Usuario {
 
         if(!id) return res.status(400).send({message: "Usuário não encontrado !"});
 
-        if (id === 1) return res.status(403).send({message: "Não é possivel editar o administrador princípal"});
+        if (id === 1 || id === '1') return res.status(403).send({message: "Não é possivel editar o administrador princípal"});
 
         await Sql.conectar(async(sql) => {
 
