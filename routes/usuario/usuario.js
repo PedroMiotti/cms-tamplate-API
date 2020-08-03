@@ -11,6 +11,7 @@
 
     //Model
     const Usuario = require('../../models/usuario/usuario');
+const { listUser } = require('../../models/usuario/usuario');
 
 
 // MIDDLEWARE
@@ -20,7 +21,7 @@ const authToken = (req, res, next) => {
     if(authHeader == null) return res.status(401).send({message: "Não autorizado"}) // If the user dont send the token
     
     jwt.verify(authHeader, process.env.JWT_SECRET, (err) => {
-        if(err) return res.status(403).send({message: "Não autorizado"});
+        if(err) return res.status(401).send({message: "Não autorizado"});
 
         next();
     })
@@ -46,10 +47,15 @@ const authToken = (req, res, next) => {
 
     // --> Criar usuario
     router.post("/criar", authToken, async (req, res) => {
-        console.log(req.body)
-
 
         await Usuario.createUser(res, req.body.login, req.body.nome, req.body.perfil)
+
+    })
+
+    // --> Listar Usuarios
+    router.get("/listar", authToken, async(req, res) => {
+
+        await Usuario.listUser(res);
 
     })
 

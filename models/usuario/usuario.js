@@ -23,7 +23,7 @@ module.exports = class Usuario {
     }   
 
     
-
+    // --> Efetuar login
     static async login(usuario, senha, res){
 
         if(!usuario || !senha) return res.status(400).send({message : "Usuário ou senha inválidos ! :("});
@@ -53,6 +53,7 @@ module.exports = class Usuario {
     
     }
 
+    // --> Informacao do usuario
     static async userInfo(id, res) {
 
         if(!id) return res.status(400).send({message: "Usuário não encontrado !"});
@@ -76,7 +77,7 @@ module.exports = class Usuario {
 
     }
 
-
+    // --> Criar usuario
     static async createUser(res, login, nome, perfilId) {
 
         //TODO --> Form validation
@@ -87,7 +88,12 @@ module.exports = class Usuario {
 
         await Sql.conectar(async (sql) => {
             try{
-                await sql.query("INSERT INTO usuario (user_login, user_nome, user_senha, perf_id) VALUES (?,?,?,?) ", [login, nome, process.env.SALT_PASSWD, perfilId])
+                bcrypt.hash(process.env.SENHA_PADRAO, parseInt(process.env.SALT_ROUNDS), async function(err, hash){
+                    if (err) throw err;
+                    
+                    await sql.query("INSERT INTO usuario (user_login, user_nome, user_senha, perf_id) VALUES (?,?,?,?) ", [login, nome, hash, perfilId])
+                    
+                });
             }
             catch (e) {
 				if (e.code) {
@@ -108,8 +114,23 @@ module.exports = class Usuario {
 				}
             }
 
-            return res.status(200).send({ message: "Usuario criado com sucesso ! Senha padrao : 1234" })
+            return res.status(201).send({ message: "Usuario criado com sucesso ! Senha padrao : 1234" })
         })
+
+
+    }
+
+    static async listUser(res){
+
+        let usuarios;
+
+        await Sql.conectar(async(sql) => {
+            
+            usuarios = await sql.query("SELECT u.user_id, u.user_login, u.user_nome, p.perf_nome FROM usuario u INNER JOIN perfil p ON u.perf_id = p.perf_id")
+                
+        });
+
+        return res.status(200).send( usuarios || [] )
 
 
     }
