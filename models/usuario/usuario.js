@@ -114,7 +114,7 @@ module.exports = class Usuario {
 				}
             }
 
-            return res.status(201).send({ message: "Usuario criado com sucesso ! Senha padrao : 1234" })
+            return res.status(201).send({ message: `Usuario criado com sucesso ! Senha padrao : ${process.env.SENHA_PADRAO}` })
         })
 
 
