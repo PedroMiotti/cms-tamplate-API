@@ -13,13 +13,12 @@
 
 
 module.exports = class Usuario {
-    constructor(id, login, nome, senha, perf_id, setor_id){
+    constructor(id, login, nome, senha, perf_id){
         this.id = id;
         this.login = login;
         this.nome = nome;
         this.senha = senha;
         this.perf_id = perf_id;
-        this.setor_id = setor_id;
     }   
 
     
@@ -31,7 +30,7 @@ module.exports = class Usuario {
         await Sql.conectar(async (sql) => {
             // TODO - Form validation
 
-            let resp = await sql.query("SELECT user_id, user_login, user_nome, user_senha FROM usuario WHERE user_login = ? ", [usuario]);
+            let resp = await sql.query("SELECT user_id, user_login, user_nome, user_senha, perf_id FROM usuario WHERE user_login = ? ", [usuario]);
             let row = resp[0];
 
             if(!resp || !resp.length) return res.status(400).send({message : "Usuário ou senha inválidos ! :("})
@@ -44,6 +43,7 @@ module.exports = class Usuario {
             u.id = row.user_id;
             u.login = row.user_login;
             u.nome = row.user_nome;
+            u.perf_id = row.perf_id;
 
             const token = jwt.sign({ u }, process.env.JWT_SECRET, { expiresIn: 31536000 })
 
