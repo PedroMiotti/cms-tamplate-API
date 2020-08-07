@@ -4,8 +4,6 @@
     // Express
     const express = require('express');
     const router = express.Router();
-    // SQL
-    const Sql = require('../../infra/sql');
     //JWT
     const jwt = require('jsonwebtoken');
 
@@ -69,6 +67,12 @@ const authToken = (req, res, next) => {
 
         await Usuario.deleteUser(res, req.body.id)
         
+    })
+
+    router.post("/editarPerfil", async(req, res) => {
+        
+        await Usuario.editProfile(res, req.body.id, req.body.nome, req.body.senhaAtual, req.body.novaSenha);
+
     })
 
 

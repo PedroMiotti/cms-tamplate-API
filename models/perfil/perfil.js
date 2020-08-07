@@ -1,3 +1,5 @@
+"use strict"
+
 // IMPORTS
     // Express
     const express = require('express');

@@ -1,3 +1,4 @@
+"use strict"
 // IMPORTS
     // Express
     const express = require('express');
@@ -170,6 +171,48 @@ module.exports = class Usuario {
 
             return res.status(200).send({ message: "Usuário excluido com successo !"})
         })
+
+    }
+
+
+    static async editProfile(res, id, nome, senhaAtual, novaSenha){
+        // TODO --> Form validation
+
+        await Sql.conectar(async(sql) => {
+            if(senhaAtual){
+
+                //Checking password
+                let senhaBD = await sql.scalar("SELECT user_senha FROM usuario WHERE user_id = ?", [id]);
+                const validPassword = await bcrypt.compare(senhaAtual, senhaBD)
+
+                if (!validPassword) return res.status(400).send({ message : "Senha atual invalida ! " });
+                if(senhaAtual === novaSenha) return res.status(400).send({ message : "Nova senha não pode ser igual a senha atual ! " });
+                
+                //Hash && Store new Password
+                bcrypt.hash(novaSenha, parseInt(process.env.SALT_ROUNDS), async function(err, hash){
+                    if (err) throw err;
+                    
+                    await sql.query("UPDATE usuario SET user_nome = ?, user_senha = ? WHERE user_id = ?",[nome, hash, id]);
+                });
+
+                this.nome = nome;
+
+                // const token = jwt.sign({ u }, process.env.JWT_SECRET, { expiresIn: 31536000 })
+
+                return res.status(201).send({  message: "Perfil alterado com successo !" });
+            }
+            else{
+                await sql.query("UPDATE usuario SET user_nome = ? WHERE user_id = ?",[nome, id]);
+
+                this.nome = nome;
+
+                // const token = jwt.sign({ Usuario }, process.env.JWT_SECRET, { expiresIn: 31536000 })
+                
+                return res.status(201).send({ message: "Perfil alterado com successo !" });
+            }
+
+        })
+
 
     }
 
