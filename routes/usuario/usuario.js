@@ -71,7 +71,7 @@ const authToken = (req, res, next) => {
 
     router.post("/editarPerfil", async(req, res) => {
         
-        await Usuario.editProfile(res, req.body.id, req.body.nome, req.body.senhaAtual, req.body.novaSenha);
+        await Usuario.editProfile(res, req.body.id, req.body.usuario, req.body.senhaAtual, req.body.novaSenha);
 
     })
 

@@ -22,6 +22,27 @@ module.exports = class Usuario {
         this.perf_id = perf_id;
     }   
 
+
+    // --> Informacao do usuario
+    static async findUser(id) {
+        
+        let res;
+        let resp;
+
+        if(!id) return res = { message : "Usuário não encontrado !" }
+
+        await Sql.conectar(async (sql) => {
+
+            resp = await sql.query("SELECT user_id, user_login, user_nome, perf_id FROM usuario WHERE user_id = ?",[id]);
+            
+            if(!resp || !resp.length) return res = { message : "Usuário não encontrado !" }
+
+        })
+        
+        return (!res ? resp[0] : res)
+    }
+
+    
     
     // --> Efetuar login
     static async login(usuario, senha, res){
@@ -174,7 +195,7 @@ module.exports = class Usuario {
 
     }
 
-
+    // --> Editar perfil (senha && nome || nome)
     static async editProfile(res, id, nome, senhaAtual, novaSenha){
         // TODO --> Form validation
 
@@ -183,6 +204,7 @@ module.exports = class Usuario {
 
                 //Checking password
                 let senhaBD = await sql.scalar("SELECT user_senha FROM usuario WHERE user_id = ?", [id]);
+                if(!senhaBD) res.status(400).send({ message : "Usuário não encontrado ! " }); //! Error --> When the user_id is not found (UnhandledPromiseRejectionWarning: Error: Illegal arguments: string, object)
                 const validPassword = await bcrypt.compare(senhaAtual, senhaBD)
 
                 if (!validPassword) return res.status(400).send({ message : "Senha atual invalida ! " });
@@ -192,28 +214,27 @@ module.exports = class Usuario {
                 bcrypt.hash(novaSenha, parseInt(process.env.SALT_ROUNDS), async function(err, hash){
                     if (err) throw err;
                     
-                    await sql.query("UPDATE usuario SET user_nome = ?, user_senha = ? WHERE user_id = ?",[nome, hash, id]);
+                    await sql.query("UPDATE usuario SET user_nome = ?, user_senha = ? WHERE user_id = ?", [nome, hash, id]);
+                    
                 });
-
-                this.nome = nome;
-
-                // const token = jwt.sign({ u }, process.env.JWT_SECRET, { expiresIn: 31536000 })
-
-                return res.status(201).send({  message: "Perfil alterado com successo !" });
             }
             else{
                 await sql.query("UPDATE usuario SET user_nome = ? WHERE user_id = ?",[nome, id]);
-
-                this.nome = nome;
-
-                // const token = jwt.sign({ Usuario }, process.env.JWT_SECRET, { expiresIn: 31536000 })
-                
-                return res.status(201).send({ message: "Perfil alterado com successo !" });
             }
 
+            let userInfo = await Usuario.findUser(id);
+
+            let u = new Usuario;
+            u.id = userInfo.user_id;
+            u.nome = nome;
+            u.login = userInfo.user_login;
+            u.perf_id = userInfo.perf_id;
+
+            const token = jwt.sign({ u }, process.env.JWT_SECRET, { expiresIn: 31536000 })
+            
+            return res.status(201).send({ token, message: "Perfil alterado com successo !" });
+
         })
-
-
     }
 
 
