@@ -15,7 +15,7 @@
 const authToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     
-    if(authHeader == null) return res.status(401).send({message: "Não autorizado"}) // If the user dont send the token
+    if(authHeader == null) return res.status(401).send({message: "Não autorizado"}) // If the user doesnt send the token
     
     jwt.verify(authHeader, process.env.JWT_SECRET, (err) => {
         if(err) return res.status(401).send({message: "Não autorizado"});
